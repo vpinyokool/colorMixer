@@ -4,6 +4,11 @@
  */
 
 const ColorMixer = {
+  // Add darkMode state
+  state: {
+    darkMode: false
+  },
+
   // Color conversion utilities
   utils: {
     clamp(v, min, max) {
@@ -187,11 +192,12 @@ const ColorMixer = {
       const adjHsb = ColorMixer.utils.rgbToHsb(adj.r, adj.g, adj.b);
       console.log('Adjusted HSB:', adjHsb);
 
-      // Mix with white using the mix value
+      // Mix with white or black depending on dark mode
+      const mixColor = ColorMixer.state.darkMode ? 0 : 255;
       const fin = {
-        r: Math.round(adj.r * mixVal + 255 * (1 - mixVal)),
-        g: Math.round(adj.g * mixVal + 255 * (1 - mixVal)),
-        b: Math.round(adj.b * mixVal + 255 * (1 - mixVal))
+        r: Math.round(adj.r * mixVal + mixColor * (1 - mixVal)),
+        g: Math.round(adj.g * mixVal + mixColor * (1 - mixVal)),
+        b: Math.round(adj.b * mixVal + mixColor * (1 - mixVal))
       };
       console.log('Final RGB:', fin);
       const finHex = ColorMixer.utils.rgbToHex(fin.r, fin.g, fin.b);
@@ -217,9 +223,6 @@ const ColorMixer = {
       $(".modal").css({
         "background": `rgba(${fin.r},${fin.g},${fin.b},${opac})`
       });
-
-      // Update blur if enabled
-      this.updateBlur();
     },
 
     updateBackgroundImage() {
@@ -239,15 +242,18 @@ const ColorMixer = {
       }
     },
 
-    updateBlur() {
-      const isBlurred = $("#blurToggle").is(":checked");
+    updateBlurAmount() {
       const blurAmount = $("#blurAmount").val();
-
-      // Apply both webkit and standard backdrop-filter
       $(".modal").css({
-        "backdrop-filter": isBlurred ? `blur(${blurAmount}px)` : "none",
-        "-webkit-backdrop-filter": isBlurred ? `blur(${blurAmount}px)` : "none"
+        "backdrop-filter": `blur(${blurAmount}px)`,
+        "-webkit-backdrop-filter": `blur(${blurAmount}px)`
       });
+    },
+
+    updateDarkMode() {
+      ColorMixer.state.darkMode = $("#darkModeToggle").is(":checked");
+      $(".modal").toggleClass("dark-mode", ColorMixer.state.darkMode);
+      this.updateColors();
     }
   },
 
@@ -266,13 +272,14 @@ const ColorMixer = {
       this.ui.updateColors();
     });
 
-    // Set up blur toggle and amount handlers
-    $("#blurToggle").on('change', () => {
-      this.ui.updateBlur();
+    // Blur amount handler
+    $("#blurAmount").on('input', () => {
+      this.ui.updateBlurAmount();
     });
 
-    $("#blurAmount").on('input', () => {
-      this.ui.updateBlur();
+    // Dark mode toggle
+    $("#darkModeToggle").on('change', () => {
+      this.ui.updateDarkMode();
     });
 
     // Set up copy buttons
@@ -291,7 +298,8 @@ const ColorMixer = {
     // Initial updates
     this.ui.updateColors();
     this.ui.updateBackgroundImage();
-    this.ui.updateBlur();
+    this.ui.updateDarkMode();
+    this.ui.updateBlurAmount();
   }
 };
 

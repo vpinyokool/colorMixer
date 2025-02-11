@@ -31,53 +31,47 @@
           <div class="sliders">
             <h2>Modification</h2>
             <div class="explanation">
-              Example: If S=50%, then 200% → S=100% (50 * 2), 100% → S=50% (no change)
-              <br>
-              Note: Final value is clamped between 20% and 100%
-            </div>
-
-            <div class="slider-pairs">
-              <div class="slider-group">
-                <div class="label-row">
-                  <label>Saturation Multiply</label>
-                  <span class="value"></span>
-                </div>
-                <input type="range" id="satMult" min="100" max="500" step="10" value="200">
-              </div>
-
-              <div class="slider-group">
-                <div class="label-row">
-                  <label>Min Saturation Clamp</label>
-                  <span class="value"></span>
-                </div>
-                <input type="range" id="minSatClamp" min="0" max="1" step="0.05" value="0.2">
-              </div>
-            </div>
-
-            <div class="slider-pairs">
-              <div class="slider-group">
-                <div class="label-row">
-                  <label>Brightness Multiply</label>
-                  <span class="value"></span>
-                </div>
-                <input type="range" id="briMult" min="100" max="500" step="10" value="160">
-              </div>
-
-              <div class="slider-group">
-                <div class="label-row">
-                  <label>Min Brightness Clamp</label>
-                  <span class="value"></span>
-                </div>
-                <input type="range" id="minBriClamp" min="0" max="1" step="0.05" value="0">
-              </div>
+              If S=50%, then S200% → S100% (50 * 2)
             </div>
 
             <div class="slider-group">
               <div class="label-row">
-                <label>Adjusted color / white mix</label>
+                <label>Saturation Multiply</label>
+                <span class="value"></span>
+              </div>
+              <input type="range" id="satMult" min="100" max="500" step="10" value="300">
+            </div>
+
+            <div class="slider-group">
+              <div class="label-row">
+                <label>Min Saturation Clamp</label>
+                <span class="value"></span>
+              </div>
+              <input type="range" id="minSatClamp" min="0" max="1" step="0.05" value="0.15">
+            </div>
+
+            <div class="slider-group">
+              <div class="label-row">
+                <label>Brightness Multiply</label>
+                <span class="value"></span>
+              </div>
+              <input type="range" id="briMult" min="100" max="500" step="10" value="160">
+            </div>
+
+            <div class="slider-group">
+              <div class="label-row">
+                <label>Min Brightness Clamp</label>
+                <span class="value"></span>
+              </div>
+              <input type="range" id="minBriClamp" min="0" max="1" step="0.05" value="0">
+            </div>
+
+            <div class="slider-group">
+              <div class="label-row">
+                <label>Base color / adjustedDom mix</label>
                 <span class="mix-value"></span>
               </div>
-              <input type="range" id="mix" min="0" max="1" step="0.05" value="0.4">
+              <input type="range" id="mix" min="0" max="1" step="0.05" value="0.3">
             </div>
 
             <div class="slider-group">
@@ -95,21 +89,20 @@
               </div>
               <input type="range" id="blurAmount" min="0" max="100" step="1" value="70">
             </div>
-
-            <div class="slider-group">
-              <label class="switch-wrapper" for="blurToggle">
-                <div class="switch">
-                  <input type="checkbox" id="blurToggle" checked>
-                  <span class="slider"></span>
-                </div>
-                <span>Background Blur</span>
-              </label>
-            </div>
           </div>
         </section>
 
         <section class="result-section">
-          <h2>Output</h2>
+          <h2>
+            Output
+            <label class="switch-wrapper" for="darkModeToggle">
+              Dark Mode
+              <div class="switch">
+                <input type="checkbox" id="darkModeToggle">
+                <span class="slider"></span>
+              </div>
+            </label>
+          </h2>
           <div class="color-boxes">
             <div class="color-row">
               <div class="color-info">
