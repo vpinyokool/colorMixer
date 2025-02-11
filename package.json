@@ -1,10 +1,12 @@
 {
-  "name": "html-css",
+  "name": "color-mixer",
   "version": "1.0.0",
-  "description": "A template for HTML and CSS",
+  "description": "A color mixer tool with HSB adjustments",
   "main": "index.html",
   "scripts": {
-    "start": "serve"
+    "start": "parcel index.html",
+    "build": "parcel build index.html",
+    "watch:sass": "sass --watch styles.scss:styles.css"
   },
   "keywords": [
     "html",
@@ -12,7 +14,11 @@
   ],
   "author": "Ives van Hoorne",
   "license": "MIT",
+  "dependencies": {
+    "jquery": "^3.6.0"
+  },
   "devDependencies": {
-    "serve": "11.2.0"
+    "parcel-bundler": "^1.12.5",
+    "sass": "^1.32.8"
   }
 }
