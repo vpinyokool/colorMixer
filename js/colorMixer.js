@@ -124,24 +124,35 @@ const ColorMixer = {
     updateColors() {
       const hex = $("#colorInput").val(),
             rgb = ColorMixer.utils.hexToRgb(hex),
-            hsb = ColorMixer.utils.rgbToHsb(rgb.r, rgb.g, rgb.b),
-            sMult = (parseFloat($("#satMult").val()) - 100) / 100,
+            hsb = ColorMixer.utils.rgbToHsb(rgb.r, rgb.g, rgb.b);
+
+      // Update original color values (not affected by sliders)
+      $("#originalBox").css("background", "#" + hex.replace("#", ""));
+      $("#originalHex").text(hex.toUpperCase());
+      $("#originalRgb").text(formatRgb(rgb.r, rgb.g, rgb.b));
+      $("#originalHsb").text(formatHsb(hsb.h, hsb.s, hsb.b));
+
+      // Process adjusted and final colors with slider values
+      const sMult = (parseFloat($("#satMult").val()) - 100) / 100,
             bMult = (parseFloat($("#briMult").val()) - 100) / 100,
             clVal = parseFloat($("#clampVal").val()),
             mixVal = parseFloat($("#mix").val()),
             opac = parseFloat($("#opacity").val());
 
+      // Create a copy of HSB for adjustments
+      const adjustedHsb = { ...hsb };
+
       // For white color (s=0), keep it white
-      if (hsb.s === 0) {
-        hsb.s = 0;
-        hsb.b = 1;
+      if (adjustedHsb.s === 0) {
+        adjustedHsb.s = 0;
+        adjustedHsb.b = 1;
       } else {
-        hsb.s = ColorMixer.utils.clamp(hsb.s + (sMult * (1 - hsb.s)), 0.2, clVal);
-        hsb.b = ColorMixer.utils.clamp(hsb.b + (bMult * (1 - hsb.b)), 0, 1.0);
+        adjustedHsb.s = ColorMixer.utils.clamp(adjustedHsb.s + (sMult * (1 - adjustedHsb.s)), 0.2, clVal);
+        adjustedHsb.b = ColorMixer.utils.clamp(adjustedHsb.b + (bMult * (1 - adjustedHsb.b)), 0, 1.0);
       }
 
       // Convert back to RGB
-      const adj = ColorMixer.utils.hsbToRgb(hsb.h, hsb.s, hsb.b);
+      const adj = ColorMixer.utils.hsbToRgb(adjustedHsb.h, adjustedHsb.s, adjustedHsb.b);
       const adjHex = ColorMixer.utils.rgbToHex(adj.r, adj.g, adj.b);
       const adjHsb = ColorMixer.utils.rgbToHsb(adj.r, adj.g, adj.b);
 
@@ -162,12 +173,7 @@ const ColorMixer = {
       const formatHsb = (h, s, b) =>
         `H${Math.round(h).toString().padStart(3, '0')}S${Math.round(s * 100).toString().padStart(3, '0')}B${Math.round(b * 100).toString().padStart(3, '0')}`;
 
-      // Update color boxes and values
-      $("#originalBox").css("background", "#" + hex.replace("#", ""));
-      $("#originalHex").text(hex.toUpperCase());
-      $("#originalRgb").text(formatRgb(rgb.r, rgb.g, rgb.b));
-      $("#originalHsb").text(formatHsb(hsb.h, hsb.s, hsb.b));
-
+      // Update adjusted and final color values
       $("#adjustedBox").css("background", `rgb(${adj.r},${adj.g},${adj.b})`);
       $("#adjustedHex").text(adjHex);
       $("#adjustedRgb").text(formatRgb(adj.r, adj.g, adj.b));

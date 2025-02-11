@@ -306,6 +306,8 @@ h2 {
   transition: all 0.2s ease;
   white-space: nowrap;
   font-weight: 500;
+  min-width: 80px;
+  text-align: center;
 
   &:hover {
     background: rgba(0, 0, 0, 0.1);
