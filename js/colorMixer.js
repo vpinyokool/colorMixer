@@ -155,8 +155,8 @@ const ColorMixer = {
       console.log('Clamp Value:', clVal);
       const mixVal = parseFloat($("#mix").val());
       console.log('Mix Value:', mixVal);
-      const opac = parseFloat($("#opacity").val());
-      console.log('Opacity:', opac);
+      const opac = parseFloat($("#opacity").val()) / 100;
+      console.log('Opacity (decimal):', opac);
 
       // Create a copy of HSB for adjustments
       const adjustedHsb = { ...hsb };
@@ -169,10 +169,10 @@ const ColorMixer = {
       } else {
         // Only apply saturation and brightness adjustments if multipliers are above 100%
         if (sMult > 0) {
-          adjustedHsb.s = ColorMixer.utils.clamp(adjustedHsb.s + (sMult * (1 - adjustedHsb.s)), 0.2, clVal);
+          adjustedHsb.s = ColorMixer.utils.clamp(adjustedHsb.s * 2, 0.2, clVal);
         }
         if (bMult > 0) {
-          adjustedHsb.b = ColorMixer.utils.clamp(adjustedHsb.b + (bMult * (1 - adjustedHsb.b)), 0, 1.0);
+          adjustedHsb.b = ColorMixer.utils.clamp(adjustedHsb.b * 1, 0, 1.0);
         }
       }
       console.log('Adjusted HSB (after):', adjustedHsb);
