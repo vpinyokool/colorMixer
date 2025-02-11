@@ -121,8 +121,7 @@ const ColorMixer = {
 
       // Apply final color to modal
       $(".modal").css({
-        "background": `rgb(${fin.r},${fin.g},${fin.b})`,
-        "opacity": opac
+        "background": `rgba(${fin.r},${fin.g},${fin.b},${opac})`
       });
 
       // Update blur if enabled
@@ -154,7 +153,8 @@ const ColorMixer = {
       // Apply both webkit and standard backdrop-filter
       $(".modal").css({
         "backdrop-filter": isBlurred ? `blur(${blurAmount}px)` : "none",
-        "-webkit-backdrop-filter": isBlurred ? `blur(${blurAmount}px)` : "none"
+        "-webkit-backdrop-filter": isBlurred ? `blur(${blurAmount}px)` : "none",
+        "background-color": "rgba(255, 255, 255, 0.5)"  // Semi-transparent background to make blur visible
       });
       console.log('Applied blur:', $(".modal").css("backdrop-filter"));
     },

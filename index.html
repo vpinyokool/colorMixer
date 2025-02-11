@@ -19,11 +19,11 @@
           <h2>Input</h2>
           <div class="input-group">
             <label>domColor:</label>
-            <input id="colorInput" placeholder="#FFFFFF" value="#FFFFFF">
+            <input id="colorInput" placeholder="#FFFFFF" value="#918091">
           </div>
           <div class="input-group">
             <label>Image Background:</label>
-            <input id="imgInput" placeholder="Enter image URL">
+            <input id="imgInput" placeholder="Enter image URL" value="https://i.pinimg.com/736x/bb/3b/4a/bb3b4a53a2dd6930d4c2204d0c9a268c.jpg">
           </div>
 
           <div class="sliders">
@@ -64,7 +64,7 @@
                 <label>Opacity:</label>
                 <span class="value"></span>
               </div>
-              <input type="range" id="opacity" min="0" max="1" step="0.05" value="1">
+              <input type="range" id="opacity" min="0" max="1" step="0.05" value="0.7">
             </div>
 
             <div class="slider-group">
@@ -75,12 +75,14 @@
               <input type="range" id="blurAmount" min="0" max="100" step="1" value="40">
             </div>
 
-            <div class="slider-group switch-wrapper">
-              <div class="switch">
-                <input type="checkbox" id="blurToggle">
-                <span class="slider"></span>
-              </div>
-              <label for="blurToggle">Background Blur</label>
+            <div class="slider-group">
+              <label class="switch-wrapper" for="blurToggle">
+                <div class="switch">
+                  <input type="checkbox" id="blurToggle" checked>
+                  <span class="slider"></span>
+                </div>
+                <span>Background Blur</span>
+              </label>
             </div>
           </div>
         </section>
