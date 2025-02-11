@@ -72,7 +72,13 @@ const ColorMixer = {
       $('.slider-group input[type="range"]').on('input', function() {
         const $value = $(this).siblings('.label-row').find('.value');
         if ($value.length) {
-          $value.text($(this).val());
+          const val = $(this).val();
+          // Add percentage sign for saturation and brightness multipliers
+          if ($(this).attr('id') === 'satMult' || $(this).attr('id') === 'briMult') {
+            $value.text(val + '%');
+          } else {
+            $value.text(val);
+          }
         }
 
         // Special handling for mix value
@@ -95,15 +101,15 @@ const ColorMixer = {
       const hex = $("#colorInput").val(),
             rgb = ColorMixer.utils.hexToRgb(hex),
             hsb = ColorMixer.utils.rgbToHsb(rgb.r, rgb.g, rgb.b),
-            sMult = parseFloat($("#satMult").val()),
-            bMult = parseFloat($("#briMult").val()),
+            sMult = parseFloat($("#satMult").val()) / 100, // Convert from percentage
+            bMult = parseFloat($("#briMult").val()) / 100, // Convert from percentage
             clVal = parseFloat($("#clampVal").val()),
             mixVal = parseFloat($("#mix").val()),
             opac = parseFloat($("#opacity").val());
 
       // Boost & clamp - matching Objective-C logic
-      // Saturation: boost by 200% (multiply by 2)
-      // Brightness: boost by 20% (multiply by 1.2)
+      // Saturation: multiply by percentage value
+      // Brightness: multiply by percentage value
       hsb.s = ColorMixer.utils.clamp(hsb.s * sMult, 0.2, clVal);
       hsb.b = ColorMixer.utils.clamp(hsb.b * bMult, 0, 1.0);
 
