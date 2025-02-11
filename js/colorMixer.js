@@ -101,18 +101,18 @@ const ColorMixer = {
             mixVal = parseFloat($("#mix").val()),
             opac = parseFloat($("#opacity").val());
 
-      // Boost & clamp
-      hsb.s = ColorMixer.utils.clamp(hsb.s * sMult, 0, clVal);
-      hsb.b = ColorMixer.utils.clamp(hsb.b * bMult, 0, clVal);
+      // Boost & clamp - matching Objective-C logic
+      hsb.s = ColorMixer.utils.clamp(hsb.s * 2, 0.2, clVal);  // Multiply by 2 as in ObjC
+      hsb.b = ColorMixer.utils.clamp(hsb.b * 1, 0, 1.0);     // Multiply by 1 as in ObjC
 
       // Convert back to RGB
       const adj = ColorMixer.utils.hsbToRgb(hsb.h, hsb.s, hsb.b);
 
-      // Mix with white
+      // Mix with white using 0.4/0.6 ratio as in ObjC
       const fin = {
-        r: Math.round(adj.r * mixVal + 255 * (1 - mixVal)),
-        g: Math.round(adj.g * mixVal + 255 * (1 - mixVal)),
-        b: Math.round(adj.b * mixVal + 255 * (1 - mixVal))
+        r: Math.round(adj.r * 0.4 + 255 * 0.6),
+        g: Math.round(adj.g * 0.4 + 255 * 0.6),
+        b: Math.round(adj.b * 0.4 + 255 * 0.6)
       };
 
       // Update color boxes
