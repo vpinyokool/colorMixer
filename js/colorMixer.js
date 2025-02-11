@@ -102,8 +102,10 @@ const ColorMixer = {
             opac = parseFloat($("#opacity").val());
 
       // Boost & clamp - matching Objective-C logic
-      hsb.s = ColorMixer.utils.clamp(hsb.s * 2, 0.2, clVal);  // Multiply by 2 as in ObjC
-      hsb.b = ColorMixer.utils.clamp(hsb.b * 1, 0, 1.0);     // Multiply by 1 as in ObjC
+      // Saturation: boost by 200% (multiply by 2)
+      // Brightness: boost by 20% (multiply by 1.2)
+      hsb.s = ColorMixer.utils.clamp(hsb.s * sMult, 0.2, clVal);
+      hsb.b = ColorMixer.utils.clamp(hsb.b * bMult, 0, 1.0);
 
       // Convert back to RGB
       const adj = ColorMixer.utils.hsbToRgb(hsb.h, hsb.s, hsb.b);
@@ -174,9 +176,14 @@ const ColorMixer = {
     console.log('Initializing Color Mixer...');
 
     // Set up event handlers for all inputs
-    $('#colorInput, #imgInput, .slider-group input[type="range"]').on('input', () => {
+    $('#colorInput, #imgInput').on('input', () => {
       this.ui.updateColors();
       this.ui.updateBackgroundImage();
+    });
+
+    // Set up slider handlers
+    $('.slider-group input[type="range"]').on('input', () => {
+      this.ui.updateColors();
     });
 
     // Set up blur toggle and amount handlers
