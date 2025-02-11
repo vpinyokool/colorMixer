@@ -118,8 +118,12 @@ const ColorMixer = {
       // Update color boxes
       $("#originalBox").css("background", "#" + hex.replace("#", ""));
       $("#adjustedBox").css("background", `rgb(${adj.r},${adj.g},${adj.b})`);
+      $("#finalBox").css({
+        "background": `rgb(${fin.r},${fin.g},${fin.b})`,
+        "opacity": opac
+      });
 
-      // Apply final color to modal
+      // Apply final color to modal background
       $(".modal").css({
         "background": `rgba(${fin.r},${fin.g},${fin.b},${opac})`
       });
@@ -153,8 +157,7 @@ const ColorMixer = {
       // Apply both webkit and standard backdrop-filter
       $(".modal").css({
         "backdrop-filter": isBlurred ? `blur(${blurAmount}px)` : "none",
-        "-webkit-backdrop-filter": isBlurred ? `blur(${blurAmount}px)` : "none",
-        "background-color": "rgba(255, 255, 255, 0.5)"  // Semi-transparent background to make blur visible
+        "-webkit-backdrop-filter": isBlurred ? `blur(${blurAmount}px)` : "none"
       });
       console.log('Applied blur:', $(".modal").css("backdrop-filter"));
     },
