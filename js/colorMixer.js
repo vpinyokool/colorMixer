@@ -31,11 +31,19 @@ const ColorMixer = {
             s = max ? d / max : 0;
 
       let h = 0;
-      if (d) {
-        if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
-        else if (max === g) h = (b - r) / d + 2;
-        else h = (r - g) / d + 4;
+      // If max equals min (i.e., grayscale including white),
+      // set saturation to 0 and keep hue at 0
+      if (d === 0) {
+        return {
+          h: 0,
+          s: 0,
+          b: max
+        };
       }
+
+      if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
 
       return {
         h: ((h * 60) % 360),
@@ -63,6 +71,10 @@ const ColorMixer = {
         g: Math.round((g + m) * 255),
         b: Math.round((bl + m) * 255)
       };
+    },
+
+    rgbToHex(r, g, b) {
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
     }
   },
 
@@ -101,35 +113,61 @@ const ColorMixer = {
       const hex = $("#colorInput").val(),
             rgb = ColorMixer.utils.hexToRgb(hex),
             hsb = ColorMixer.utils.rgbToHsb(rgb.r, rgb.g, rgb.b),
-            sMult = parseFloat($("#satMult").val()) / 100, // Convert from percentage
-            bMult = parseFloat($("#briMult").val()) / 100, // Convert from percentage
+            sMult = (parseFloat($("#satMult").val()) - 100) / 100,
+            bMult = (parseFloat($("#briMult").val()) - 100) / 100,
             clVal = parseFloat($("#clampVal").val()),
             mixVal = parseFloat($("#mix").val()),
             opac = parseFloat($("#opacity").val());
 
-      // Boost & clamp - matching Objective-C logic
-      // Saturation: multiply by percentage value
-      // Brightness: multiply by percentage value
-      hsb.s = ColorMixer.utils.clamp(hsb.s * sMult, 0.2, clVal);
-      hsb.b = ColorMixer.utils.clamp(hsb.b * bMult, 0, 1.0);
+      // For white color (s=0), keep it white
+      if (hsb.s === 0) {
+        hsb.s = 0;
+        hsb.b = 1;
+      } else {
+        hsb.s = ColorMixer.utils.clamp(hsb.s + (sMult * (1 - hsb.s)), 0.2, clVal);
+        hsb.b = ColorMixer.utils.clamp(hsb.b + (bMult * (1 - hsb.b)), 0, 1.0);
+      }
 
       // Convert back to RGB
       const adj = ColorMixer.utils.hsbToRgb(hsb.h, hsb.s, hsb.b);
+      const adjHex = ColorMixer.utils.rgbToHex(adj.r, adj.g, adj.b);
+      const adjHsb = ColorMixer.utils.rgbToHsb(adj.r, adj.g, adj.b);
 
-      // Mix with white using 0.4/0.6 ratio as in ObjC
+      // Mix with white using the mix value
       const fin = {
-        r: Math.round(adj.r * 0.4 + 255 * 0.6),
-        g: Math.round(adj.g * 0.4 + 255 * 0.6),
-        b: Math.round(adj.b * 0.4 + 255 * 0.6)
+        r: Math.round(adj.r * mixVal + 255 * (1 - mixVal)),
+        g: Math.round(adj.g * mixVal + 255 * (1 - mixVal)),
+        b: Math.round(adj.b * mixVal + 255 * (1 - mixVal))
       };
+      const finHex = ColorMixer.utils.rgbToHex(fin.r, fin.g, fin.b);
+      const finHsb = ColorMixer.utils.rgbToHsb(fin.r, fin.g, fin.b);
 
-      // Update color boxes
+      // Format RGB string with padding to 3 digits
+      const formatRgb = (r, g, b) =>
+        `R${r.toString().padStart(3, '0')}G${g.toString().padStart(3, '0')}B${b.toString().padStart(3, '0')}`;
+
+      // Format HSB string with padding to 3 digits
+      const formatHsb = (h, s, b) =>
+        `H${Math.round(h).toString().padStart(3, '0')}S${Math.round(s * 100).toString().padStart(3, '0')}B${Math.round(b * 100).toString().padStart(3, '0')}`;
+
+      // Update color boxes and values
       $("#originalBox").css("background", "#" + hex.replace("#", ""));
+      $("#originalHex").text(hex.toUpperCase());
+      $("#originalRgb").text(formatRgb(rgb.r, rgb.g, rgb.b));
+      $("#originalHsb").text(formatHsb(hsb.h, hsb.s, hsb.b));
+
       $("#adjustedBox").css("background", `rgb(${adj.r},${adj.g},${adj.b})`);
+      $("#adjustedHex").text(adjHex);
+      $("#adjustedRgb").text(formatRgb(adj.r, adj.g, adj.b));
+      $("#adjustedHsb").text(formatHsb(adjHsb.h, adjHsb.s, adjHsb.b));
+
       $("#finalBox").css({
         "background": `rgb(${fin.r},${fin.g},${fin.b})`,
         "opacity": opac
       });
+      $("#finalHex").text(finHex);
+      $("#finalRgb").text(formatRgb(fin.r, fin.g, fin.b));
+      $("#finalHsb").text(formatHsb(finHsb.h, finHsb.s, finHsb.b));
 
       // Apply final color to modal background
       $(".modal").css({
@@ -201,6 +239,19 @@ const ColorMixer = {
     $("#blurAmount").on('input', () => {
       console.log('Blur Amount Changed:', $("#blurAmount").val());
       this.ui.updateBlur();
+    });
+
+    // Set up copy buttons
+    $('.copy-btn').on('click', function() {
+      const targetId = $(this).data('target');
+      const hexText = $(`#${targetId}`).text();
+      navigator.clipboard.writeText(hexText).then(() => {
+        const originalText = $(this).text();
+        $(this).text('Copied!');
+        setTimeout(() => {
+          $(this).text(originalText);
+        }, 1500);
+      });
     });
 
     // Initial updates

@@ -27,6 +27,12 @@
           </div>
 
           <div class="sliders">
+            <h2>Modification</h2>
+            <div class="examples">
+              <div class="explanation">Example: If S=50%, then 200% → S=100% (50 * 2), 100% → S=50% (no change)</div>
+              <div class="explanation">Note: Final value is clamped between 20% and 100%</div>
+            </div>
+
             <div class="slider-group">
               <div class="label-row">
                 <label>Saturation Multiply:</label>
@@ -40,7 +46,7 @@
                 <label>Brightness Multiply:</label>
                 <span class="value"></span>
               </div>
-              <input type="range" id="briMult" min="100" max="500" step="10" value="120">
+              <input type="range" id="briMult" min="100" max="500" step="10" value="160">
             </div>
 
             <div class="slider-group">
@@ -90,17 +96,55 @@
         <section class="result-section">
           <h2>Output</h2>
           <div class="color-boxes">
-            <div class="color-box">
-              <div id="originalBox" class="box"></div>
-              <label>domColor</label>
+            <div class="color-row">
+              <div class="color-info">
+                <div id="originalBox" class="box"></div>
+                <div class="color-details">
+                  <div class="name">Domcolor</div>
+                  <div class="values">
+                    <span id="originalHex" class="hex"></span>
+                    <span class="separator">·</span>
+                    <span id="originalRgb" class="rgb"></span>
+                    <span class="separator">·</span>
+                    <span id="originalHsb" class="hsb"></span>
+                  </div>
+                </div>
+              </div>
+              <button class="copy-btn" data-target="originalHex">Copy hex</button>
             </div>
-            <div class="color-box">
-              <div id="adjustedBox" class="box"></div>
-              <label>adjusted domColor</label>
+
+            <div class="color-row">
+              <div class="color-info">
+                <div id="adjustedBox" class="box"></div>
+                <div class="color-details">
+                  <div class="name">adjustedDomColor</div>
+                  <div class="values">
+                    <span id="adjustedHex" class="hex"></span>
+                    <span class="separator">·</span>
+                    <span id="adjustedRgb" class="rgb"></span>
+                    <span class="separator">·</span>
+                    <span id="adjustedHsb" class="hsb"></span>
+                  </div>
+                </div>
+              </div>
+              <button class="copy-btn" data-target="adjustedHex">Copy hex</button>
             </div>
-            <div class="color-box">
-              <div id="finalBox" class="box"></div>
-              <label>finalcolor</label>
+
+            <div class="color-row">
+              <div class="color-info">
+                <div id="finalBox" class="box"></div>
+                <div class="color-details">
+                  <div class="name">finalColor</div>
+                  <div class="values">
+                    <span id="finalHex" class="hex"></span>
+                    <span class="separator">·</span>
+                    <span id="finalRgb" class="rgb"></span>
+                    <span class="separator">·</span>
+                    <span id="finalHsb" class="hsb"></span>
+                  </div>
+                </div>
+              </div>
+              <button class="copy-btn" data-target="finalHex">Copy hex</button>
             </div>
           </div>
         </section>
