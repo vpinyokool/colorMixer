@@ -6,18 +6,6 @@
 const ColorMixer = {
   // Color conversion utilities
   utils: {
-    // Test function to verify conversion
-    testHsb(hex) {
-      const rgb = this.hexToRgb(hex);
-      console.log('RGB:', rgb);
-      const hsb = this.rgbToHsb(rgb.r, rgb.g, rgb.b);
-      console.log('HSB:', {
-        h: Math.round(hsb.h),
-        s: Math.round(hsb.s * 100),
-        b: Math.round(hsb.b * 100)
-      });
-    },
-
     clamp(v, min, max) {
       return Math.max(min, Math.min(v, max));
     },
@@ -87,6 +75,28 @@ const ColorMixer = {
 
     rgbToHex(r, g, b) {
       return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+    },
+
+    formatRgb(r, g, b) {
+      return `R${String(r).padStart(3, '0')}G${String(g).padStart(3, '0')}B${String(b).padStart(3, '0')}`;
+    },
+
+    formatHsb(h, s, b) {
+      const hue = Math.round(h);
+      const sat = Math.round(s * 100);
+      const bri = Math.round(b * 100);
+      return `H${String(hue).padStart(3, '0')}S${String(sat).padStart(3, '0')}B${String(bri).padStart(3, '0')}`;
+    },
+
+    testHsb(hex) {
+      const rgb = this.hexToRgb(hex);
+      console.log('RGB:', rgb);
+      const hsb = this.rgbToHsb(rgb.r, rgb.g, rgb.b);
+      console.log('HSB:', {
+        h: Math.round(hsb.h),
+        s: Math.round(hsb.s * 100),
+        b: Math.round(hsb.b * 100)
+      });
     }
   },
 
@@ -122,39 +132,58 @@ const ColorMixer = {
     },
 
     updateColors() {
-      const hex = $("#colorInput").val(),
-            rgb = ColorMixer.utils.hexToRgb(hex),
-            hsb = ColorMixer.utils.rgbToHsb(rgb.r, rgb.g, rgb.b);
+      console.log('Updating colors...');
+      const hex = $("#colorInput").val();
+      console.log('Hex:', hex);
+      const rgb = ColorMixer.utils.hexToRgb(hex);
+      console.log('RGB:', rgb);
+      const hsb = ColorMixer.utils.rgbToHsb(rgb.r, rgb.g, rgb.b);
+      console.log('HSB:', hsb);
 
       // Update original color values (not affected by sliders)
       $("#originalBox").css("background", "#" + hex.replace("#", ""));
       $("#originalHex").text(hex.toUpperCase());
-      $("#originalRgb").text(formatRgb(rgb.r, rgb.g, rgb.b));
-      $("#originalHsb").text(formatHsb(hsb.h, hsb.s, hsb.b));
+      $("#originalRgb").text(ColorMixer.utils.formatRgb(rgb.r, rgb.g, rgb.b));
+      $("#originalHsb").text(ColorMixer.utils.formatHsb(hsb.h, hsb.s, hsb.b));
 
       // Process adjusted and final colors with slider values
-      const sMult = (parseFloat($("#satMult").val()) - 100) / 100,
-            bMult = (parseFloat($("#briMult").val()) - 100) / 100,
-            clVal = parseFloat($("#clampVal").val()),
-            mixVal = parseFloat($("#mix").val()),
-            opac = parseFloat($("#opacity").val());
+      const sMult = (parseFloat($("#satMult").val()) - 100) / 100;
+      console.log('Saturation Multiplier:', sMult);
+      const bMult = (parseFloat($("#briMult").val()) - 100) / 100;
+      console.log('Brightness Multiplier:', bMult);
+      const clVal = parseFloat($("#clampVal").val());
+      console.log('Clamp Value:', clVal);
+      const mixVal = parseFloat($("#mix").val());
+      console.log('Mix Value:', mixVal);
+      const opac = parseFloat($("#opacity").val());
+      console.log('Opacity:', opac);
 
       // Create a copy of HSB for adjustments
       const adjustedHsb = { ...hsb };
+      console.log('Adjusted HSB (before):', adjustedHsb);
 
       // For white color (s=0), keep it white
       if (adjustedHsb.s === 0) {
         adjustedHsb.s = 0;
         adjustedHsb.b = 1;
       } else {
-        adjustedHsb.s = ColorMixer.utils.clamp(adjustedHsb.s + (sMult * (1 - adjustedHsb.s)), 0.2, clVal);
-        adjustedHsb.b = ColorMixer.utils.clamp(adjustedHsb.b + (bMult * (1 - adjustedHsb.b)), 0, 1.0);
+        // Only apply saturation and brightness adjustments if multipliers are above 100%
+        if (sMult > 0) {
+          adjustedHsb.s = ColorMixer.utils.clamp(adjustedHsb.s + (sMult * (1 - adjustedHsb.s)), 0.2, clVal);
+        }
+        if (bMult > 0) {
+          adjustedHsb.b = ColorMixer.utils.clamp(adjustedHsb.b + (bMult * (1 - adjustedHsb.b)), 0, 1.0);
+        }
       }
+      console.log('Adjusted HSB (after):', adjustedHsb);
 
       // Convert back to RGB
       const adj = ColorMixer.utils.hsbToRgb(adjustedHsb.h, adjustedHsb.s, adjustedHsb.b);
+      console.log('Adjusted RGB:', adj);
       const adjHex = ColorMixer.utils.rgbToHex(adj.r, adj.g, adj.b);
+      console.log('Adjusted Hex:', adjHex);
       const adjHsb = ColorMixer.utils.rgbToHsb(adj.r, adj.g, adj.b);
+      console.log('Adjusted HSB:', adjHsb);
 
       // Mix with white using the mix value
       const fin = {
@@ -162,30 +191,25 @@ const ColorMixer = {
         g: Math.round(adj.g * mixVal + 255 * (1 - mixVal)),
         b: Math.round(adj.b * mixVal + 255 * (1 - mixVal))
       };
+      console.log('Final RGB:', fin);
       const finHex = ColorMixer.utils.rgbToHex(fin.r, fin.g, fin.b);
+      console.log('Final Hex:', finHex);
       const finHsb = ColorMixer.utils.rgbToHsb(fin.r, fin.g, fin.b);
-
-      // Format RGB string with padding to 3 digits
-      const formatRgb = (r, g, b) =>
-        `R${r.toString().padStart(3, '0')}G${g.toString().padStart(3, '0')}B${b.toString().padStart(3, '0')}`;
-
-      // Format HSB string with padding to 3 digits
-      const formatHsb = (h, s, b) =>
-        `H${Math.round(h).toString().padStart(3, '0')}S${Math.round(s * 100).toString().padStart(3, '0')}B${Math.round(b * 100).toString().padStart(3, '0')}`;
+      console.log('Final HSB:', finHsb);
 
       // Update adjusted and final color values
       $("#adjustedBox").css("background", `rgb(${adj.r},${adj.g},${adj.b})`);
       $("#adjustedHex").text(adjHex);
-      $("#adjustedRgb").text(formatRgb(adj.r, adj.g, adj.b));
-      $("#adjustedHsb").text(formatHsb(adjHsb.h, adjHsb.s, adjHsb.b));
+      $("#adjustedRgb").text(ColorMixer.utils.formatRgb(adj.r, adj.g, adj.b));
+      $("#adjustedHsb").text(ColorMixer.utils.formatHsb(adjHsb.h, adjHsb.s, adjHsb.b));
 
       $("#finalBox").css({
         "background": `rgb(${fin.r},${fin.g},${fin.b})`,
         "opacity": opac
       });
       $("#finalHex").text(finHex);
-      $("#finalRgb").text(formatRgb(fin.r, fin.g, fin.b));
-      $("#finalHsb").text(formatHsb(finHsb.h, finHsb.s, finHsb.b));
+      $("#finalRgb").text(ColorMixer.utils.formatRgb(fin.r, fin.g, fin.b));
+      $("#finalHsb").text(ColorMixer.utils.formatHsb(finHsb.h, finHsb.s, finHsb.b));
 
       // Apply final color to modal background
       $(".modal").css({
@@ -216,29 +240,18 @@ const ColorMixer = {
     updateBlur() {
       const isBlurred = $("#blurToggle").is(":checked");
       const blurAmount = $("#blurAmount").val();
-      console.log('Blur Update:', { isBlurred, blurAmount });
 
       // Apply both webkit and standard backdrop-filter
       $(".modal").css({
         "backdrop-filter": isBlurred ? `blur(${blurAmount}px)` : "none",
         "-webkit-backdrop-filter": isBlurred ? `blur(${blurAmount}px)` : "none"
       });
-      console.log('Applied blur:', $(".modal").css("backdrop-filter"));
-    },
-
-    toggleBlur() {
-      console.log('Toggle Blur Called');
-      this.updateBlur();
     }
   },
 
   // Initialize the application
   init() {
-    // Test the default color
-    this.utils.testHsb('918091');
-
     this.ui.updateSliderValues();
-    console.log('Initializing Color Mixer...');
 
     // Set up event handlers for all inputs
     $('#colorInput, #imgInput').on('input', () => {
@@ -253,12 +266,10 @@ const ColorMixer = {
 
     // Set up blur toggle and amount handlers
     $("#blurToggle").on('change', () => {
-      console.log('Blur Toggle Changed:', $("#blurToggle").is(":checked"));
       this.ui.updateBlur();
     });
 
     $("#blurAmount").on('input', () => {
-      console.log('Blur Amount Changed:', $("#blurAmount").val());
       this.ui.updateBlur();
     });
 
@@ -279,7 +290,6 @@ const ColorMixer = {
     this.ui.updateColors();
     this.ui.updateBackgroundImage();
     this.ui.updateBlur();
-    console.log('Initialization complete');
   }
 };
 
