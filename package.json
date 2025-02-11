@@ -4,9 +4,10 @@
   "description": "A color mixer tool with HSB adjustments",
   "main": "index.html",
   "scripts": {
-    "start": "parcel index.html",
-    "build": "parcel build index.html",
-    "watch:sass": "sass --watch styles.scss:styles.css"
+    "start": "parcel index.html --open",
+    "build": "parcel build index.html --public-url ./",
+    "clean": "rm -rf .cache dist",
+    "dev": "npm run clean && npm start"
   },
   "keywords": [
     "html",
@@ -18,6 +19,7 @@
     "jquery": "^3.6.0"
   },
   "devDependencies": {
+    "gh-pages": "^3.2.3",
     "parcel-bundler": "^1.12.5",
     "sass": "^1.32.8"
   }

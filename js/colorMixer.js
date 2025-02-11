@@ -70,7 +70,24 @@ const ColorMixer = {
   ui: {
     updateSliderValues() {
       $('.slider-group input[type="range"]').on('input', function() {
-        $(this).siblings('.value').text($(this).val());
+        const $value = $(this).siblings('.label-row').find('.value');
+        if ($value.length) {
+          $value.text($(this).val());
+        }
+
+        // Special handling for mix value
+        const $mixValue = $(this).siblings('.label-row').find('.mix-value');
+        if ($mixValue.length) {
+          const val = parseFloat($(this).val());
+          $mixValue.text(`${(val * 100).toFixed(0)}% / ${((1 - val) * 100).toFixed(0)}%`);
+        }
+
+        // Update slider fill state
+        const min = parseFloat($(this).attr('min')) || 0;
+        const max = parseFloat($(this).attr('max')) || 1;
+        const val = parseFloat($(this).val());
+        const percentage = ((val - min) / (max - min)) * 100;
+        $(this).css('--value-percent', `${percentage}%`);
       }).trigger('input');
     },
 
@@ -101,32 +118,80 @@ const ColorMixer = {
       // Update color boxes
       $("#originalBox").css("background", "#" + hex.replace("#", ""));
       $("#adjustedBox").css("background", `rgb(${adj.r},${adj.g},${adj.b})`);
-      $("#finalBox").css({
+
+      // Apply final color to modal
+      $(".modal").css({
         "background": `rgb(${fin.r},${fin.g},${fin.b})`,
         "opacity": opac
       });
+
+      // Update blur if enabled
+      this.updateBlur();
     },
 
     updateBackgroundImage() {
       const imgUrl = $("#imgInput").val();
       if (imgUrl) {
-        $("body").css("background-image", `url(${imgUrl})`);
+        $(".app-background").css({
+          "background-image": `url(${imgUrl})`,
+          "background-size": "cover",
+          "background-position": "center",
+          "background-color": "#111111"
+        });
+      } else {
+        $(".app-background").css({
+          "background-image": "none",
+          "background-color": "#111111"
+        });
       }
+    },
+
+    updateBlur() {
+      const isBlurred = $("#blurToggle").is(":checked");
+      const blurAmount = $("#blurAmount").val();
+      console.log('Blur Update:', { isBlurred, blurAmount });
+
+      // Apply both webkit and standard backdrop-filter
+      $(".modal").css({
+        "backdrop-filter": isBlurred ? `blur(${blurAmount}px)` : "none",
+        "-webkit-backdrop-filter": isBlurred ? `blur(${blurAmount}px)` : "none"
+      });
+      console.log('Applied blur:', $(".modal").css("backdrop-filter"));
+    },
+
+    toggleBlur() {
+      console.log('Toggle Blur Called');
+      this.updateBlur();
     }
   },
 
   // Initialize the application
   init() {
     this.ui.updateSliderValues();
+    console.log('Initializing Color Mixer...');
 
-    // Set up event handlers
-    $("#generateBtn").click(() => {
+    // Set up event handlers for all inputs
+    $('#colorInput, #imgInput, .slider-group input[type="range"]').on('input', () => {
       this.ui.updateColors();
       this.ui.updateBackgroundImage();
     });
 
-    // Initial color generation
-    $("#generateBtn").click();
+    // Set up blur toggle and amount handlers
+    $("#blurToggle").on('change', () => {
+      console.log('Blur Toggle Changed:', $("#blurToggle").is(":checked"));
+      this.ui.updateBlur();
+    });
+
+    $("#blurAmount").on('input', () => {
+      console.log('Blur Amount Changed:', $("#blurAmount").val());
+      this.ui.updateBlur();
+    });
+
+    // Initial updates
+    this.ui.updateColors();
+    this.ui.updateBackgroundImage();
+    this.ui.updateBlur();
+    console.log('Initialization complete');
   }
 };
 
