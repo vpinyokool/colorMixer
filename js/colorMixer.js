@@ -6,6 +6,18 @@
 const ColorMixer = {
   // Color conversion utilities
   utils: {
+    // Test function to verify conversion
+    testHsb(hex) {
+      const rgb = this.hexToRgb(hex);
+      console.log('RGB:', rgb);
+      const hsb = this.rgbToHsb(rgb.r, rgb.g, rgb.b);
+      console.log('HSB:', {
+        h: Math.round(hsb.h),
+        s: Math.round(hsb.s * 100),
+        b: Math.round(hsb.b * 100)
+      });
+    },
+
     clamp(v, min, max) {
       return Math.max(min, Math.min(v, max));
     },
@@ -27,28 +39,28 @@ const ColorMixer = {
       b /= 255;
       const max = Math.max(r, g, b),
             min = Math.min(r, g, b),
-            d = max - min,
-            s = max ? d / max : 0;
+            d = max - min;
 
       let h = 0;
-      // If max equals min (i.e., grayscale including white),
-      // set saturation to 0 and keep hue at 0
-      if (d === 0) {
-        return {
-          h: 0,
-          s: 0,
-          b: max
-        };
+      let s = max === 0 ? 0 : d / max;
+      let v = max;
+
+      if (d !== 0) {
+        if (max === r) {
+          h = (g - b) / d + (g < b ? 6 : 0);
+        } else if (max === g) {
+          h = (b - r) / d + 2;
+        } else {
+          h = (r - g) / d + 4;
+        }
+        h *= 60;
+        if (h < 0) h += 360;
       }
 
-      if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
-      else if (max === g) h = (b - r) / d + 2;
-      else h = (r - g) / d + 4;
-
       return {
-        h: ((h * 60) % 360),
+        h: h,
         s: s,
-        b: max
+        b: v
       };
     },
 
@@ -216,6 +228,9 @@ const ColorMixer = {
 
   // Initialize the application
   init() {
+    // Test the default color
+    this.utils.testHsb('918091');
+
     this.ui.updateSliderValues();
     console.log('Initializing Color Mixer...');
 
