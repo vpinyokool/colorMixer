@@ -17,49 +17,64 @@
       <div class="container">
         <section class="input-section">
           <h2>Input</h2>
-          <div class="input-group">
-            <label>domColor:</label>
-            <input id="colorInput" placeholder="#FFFFFF" value="#918091">
-          </div>
-          <div class="input-group">
-            <label>Image Background:</label>
-            <input id="imgInput" placeholder="Enter image URL" value="https://i.pinimg.com/736x/bb/3b/4a/bb3b4a53a2dd6930d4c2204d0c9a268c.jpg">
+          <div class="input-pairs">
+            <div class="input-group">
+              <label>domColor</label>
+              <input id="colorInput" placeholder="#FFFFFF" value="#918091">
+            </div>
+            <div class="input-group">
+              <label>bgImg</label>
+              <input id="imgInput" placeholder="Enter image URL" value="https://i.pinimg.com/736x/bb/3b/4a/bb3b4a53a2dd6930d4c2204d0c9a268c.jpg">
+            </div>
           </div>
 
           <div class="sliders">
             <h2>Modification</h2>
-            <div class="examples">
-              <div class="explanation">Example: If S=50%, then 200% → S=100% (50 * 2), 100% → S=50% (no change)</div>
-              <div class="explanation">Note: Final value is clamped between 20% and 100%</div>
+            <div class="explanation">
+              Example: If S=50%, then 200% → S=100% (50 * 2), 100% → S=50% (no change)
+              <br>
+              Note: Final value is clamped between 20% and 100%
             </div>
 
-            <div class="slider-group">
-              <div class="label-row">
-                <label>Saturation Multiply:</label>
-                <span class="value"></span>
+            <div class="slider-pairs">
+              <div class="slider-group">
+                <div class="label-row">
+                  <label>Saturation Multiply</label>
+                  <span class="value"></span>
+                </div>
+                <input type="range" id="satMult" min="100" max="500" step="10" value="200">
               </div>
-              <input type="range" id="satMult" min="100" max="500" step="10" value="200">
-            </div>
 
-            <div class="slider-group">
-              <div class="label-row">
-                <label>Brightness Multiply:</label>
-                <span class="value"></span>
+              <div class="slider-group">
+                <div class="label-row">
+                  <label>Min Saturation Clamp</label>
+                  <span class="value"></span>
+                </div>
+                <input type="range" id="minSatClamp" min="0" max="1" step="0.05" value="0.2">
               </div>
-              <input type="range" id="briMult" min="100" max="500" step="10" value="160">
             </div>
 
-            <div class="slider-group">
-              <div class="label-row">
-                <label>Clamp Value:</label>
-                <span class="value"></span>
+            <div class="slider-pairs">
+              <div class="slider-group">
+                <div class="label-row">
+                  <label>Brightness Multiply</label>
+                  <span class="value"></span>
+                </div>
+                <input type="range" id="briMult" min="100" max="500" step="10" value="160">
               </div>
-              <input type="range" id="clampVal" min="0" max="1" step="0.05" value="0.2">
+
+              <div class="slider-group">
+                <div class="label-row">
+                  <label>Min Brightness Clamp</label>
+                  <span class="value"></span>
+                </div>
+                <input type="range" id="minBriClamp" min="0" max="1" step="0.05" value="0">
+              </div>
             </div>
 
             <div class="slider-group">
               <div class="label-row">
-                <label>Adjusted color / white mix:</label>
+                <label>Adjusted color / white mix</label>
                 <span class="mix-value"></span>
               </div>
               <input type="range" id="mix" min="0" max="1" step="0.05" value="0.4">
@@ -67,7 +82,7 @@
 
             <div class="slider-group">
               <div class="label-row">
-                <label>Opacity:</label>
+                <label>Opacity</label>
                 <span class="value"></span>
               </div>
               <input type="range" id="opacity" min="0" max="100" step="1" value="70">
@@ -75,10 +90,10 @@
 
             <div class="slider-group">
               <div class="label-row">
-                <label>Blur Amount:</label>
+                <label>Blur Amount</label>
                 <span class="value"></span>
               </div>
-              <input type="range" id="blurAmount" min="0" max="100" step="1" value="40">
+              <input type="range" id="blurAmount" min="0" max="100" step="1" value="70">
             </div>
 
             <div class="slider-group">

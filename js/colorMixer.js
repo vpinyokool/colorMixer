@@ -151,8 +151,10 @@ const ColorMixer = {
       console.log('Saturation Multiplier:', sMult);
       const bMult = (parseFloat($("#briMult").val()) - 100) / 100;
       console.log('Brightness Multiplier:', bMult);
-      const clVal = parseFloat($("#clampVal").val());
-      console.log('Clamp Value:', clVal);
+      const minSatClamp = parseFloat($("#minSatClamp").val());
+      console.log('Min Saturation Clamp:', minSatClamp);
+      const minBriClamp = parseFloat($("#minBriClamp").val());
+      console.log('Min Brightness Clamp:', minBriClamp);
       const mixVal = parseFloat($("#mix").val());
       console.log('Mix Value:', mixVal);
       const opac = parseFloat($("#opacity").val()) / 100;
@@ -169,10 +171,10 @@ const ColorMixer = {
       } else {
         // Only apply saturation and brightness adjustments if multipliers are above 100%
         if (sMult > 0) {
-          adjustedHsb.s = ColorMixer.utils.clamp(adjustedHsb.s * 2, 0.2, clVal);
+          adjustedHsb.s = ColorMixer.utils.clamp(adjustedHsb.s * (1 + sMult), minSatClamp, 1.0);
         }
         if (bMult > 0) {
-          adjustedHsb.b = ColorMixer.utils.clamp(adjustedHsb.b * 1, 0, 1.0);
+          adjustedHsb.b = ColorMixer.utils.clamp(adjustedHsb.b * (1 + bMult), minBriClamp, 1.0);
         }
       }
       console.log('Adjusted HSB (after):', adjustedHsb);
