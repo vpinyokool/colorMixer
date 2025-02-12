@@ -124,7 +124,9 @@ const ColorMixer = {
         const $mixValue = $(this).siblings('.label-row').find('.mix-value');
         if ($mixValue.length) {
           const val = parseFloat($(this).val());
-          $mixValue.text(`${(val * 100).toFixed(0)}% / ${((1 - val) * 100).toFixed(0)}%`);
+          const adjustedPercent = (val * 100).toFixed(0);
+          const basePercent = ((1 - val) * 100).toFixed(0);
+          $mixValue.text(`${basePercent}% / ${adjustedPercent}%`);
         }
 
         // Update slider fill state
@@ -251,6 +253,11 @@ const ColorMixer = {
     updateDarkMode() {
       ColorMixer.state.darkMode = $("#darkModeToggle").is(":checked");
       $(".modal").toggleClass("dark-mode", ColorMixer.state.darkMode);
+
+      // Update the mix label based on dark mode
+      const baseColor = ColorMixer.state.darkMode ? "black" : "white";
+      $(".slider-group label:contains('Base color')").text(`${baseColor} / adjustedDom mix`);
+
       this.updateColors();
     }
   },
