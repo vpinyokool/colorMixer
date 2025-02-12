@@ -1,3 +1,5 @@
+@use "sass:math";
+
 // Variables
 $text-color: #000000;
 $border-color: rgba(0,0,0,0.1);
@@ -261,7 +263,7 @@ h2 {
       width: 16px;
       border-radius: 50%;
       background: black;
-      margin-top: -7px;
+      margin-top: math.div(-16px, 2);
       cursor: pointer;
     }
   }
@@ -283,7 +285,7 @@ h2 {
 .color-boxes {
   display: flex;
   flex-direction: column;
-  gap: $spacing * 0.5;
+  gap: math.div($spacing, 2);
   width: 100%;
 }
 
@@ -298,7 +300,7 @@ h2 {
 .color-info {
   display: flex;
   align-items: center;
-  gap: $spacing * 0.5;
+  gap: math.div($spacing, 2);
   flex: 1;
 }
 
