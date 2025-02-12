@@ -256,7 +256,7 @@ const ColorMixer = {
 
       // Update the mix label based on dark mode
       const baseColor = ColorMixer.state.darkMode ? "black" : "white";
-      $(".slider-group label:contains('Base color')").text(`${baseColor} / adjustedDom mix`);
+      $(".slider-group label:contains('white'),.slider-group label:contains('black')").text(`${baseColor} / adjustedDom mix`);
 
       this.updateColors();
     }
