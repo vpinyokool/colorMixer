@@ -100,7 +100,7 @@ body {
     }
 
     .switch input:checked + .slider {
-      background-color: white;
+      background-color: $switch-green;
     }
 
     .copy-btn {
@@ -134,10 +134,10 @@ body {
 
 // Container
 .container {
-  padding: $spacing * 1.5;
+  padding: math.multiply($spacing, 1.5);
 
   section {
-    padding-top: $spacing * 2;
+    padding-top: math.multiply($spacing, 2);
 
     &.input-section {
       padding-top: 0;
@@ -198,7 +198,7 @@ h2 {
 // Sliders
 .sliders {
   margin: 0;
-  margin-top: $spacing*2;
+  margin-top: math.multiply($spacing, 2);
 
   h2 {
     margin-bottom: 4px;
@@ -305,9 +305,9 @@ h2 {
 }
 
 .box {
-  width: $spacing*2;
-  height: $spacing*2;
-  min-width: $spacing*2;
+  width: math.multiply($spacing, 2);
+  height: math.multiply($spacing, 2);
+  min-width: math.multiply($spacing, 2);
   border: 1px solid $border-color;
   border-radius: 8px;
   background: white;
