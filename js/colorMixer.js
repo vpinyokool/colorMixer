@@ -138,16 +138,23 @@ const ColorMixer = {
 
     updateColors() {
       console.log('Updating colors...');
-      const hex = $("#colorInput").val();
+      const hex = $("#colorInput").val().replace(/[^0-9A-Fa-f]/g, '');  // Clean hex input
       console.log('Hex:', hex);
+
+      // Ensure valid hex
+      if (!hex || hex.length < 6) {
+        console.log('Invalid hex value');
+        return;
+      }
+
       const rgb = ColorMixer.utils.hexToRgb(hex);
       console.log('RGB:', rgb);
       const hsb = ColorMixer.utils.rgbToHsb(rgb.r, rgb.g, rgb.b);
       console.log('HSB:', hsb);
 
       // Update original color values (not affected by sliders)
-      $("#originalBox").css("background", "#" + hex.replace("#", ""));
-      $("#originalHex").text(hex.toUpperCase());
+      $("#originalBox").css("background", "#" + hex);
+      $("#originalHex").text("#" + hex.toUpperCase());
       $("#originalRgb").text(ColorMixer.utils.formatRgb(rgb.r, rgb.g, rgb.b));
       $("#originalHsb").text(ColorMixer.utils.formatHsb(hsb.h, hsb.s, hsb.b));
 
@@ -169,19 +176,10 @@ const ColorMixer = {
       const adjustedHsb = { ...hsb };
       console.log('Adjusted HSB (before):', adjustedHsb);
 
-      // For white color (s=0), keep it white
-      if (adjustedHsb.s === 0) {
-        adjustedHsb.s = 0;
-        adjustedHsb.b = 1;
-      } else {
-        // Only apply saturation and brightness adjustments if multipliers are above 100%
-        if (sMult > 0) {
-          adjustedHsb.s = ColorMixer.utils.clamp(adjustedHsb.s * (1 + sMult), minSatClamp, 1.0);
-        }
-        if (bMult > 0) {
-          adjustedHsb.b = ColorMixer.utils.clamp(adjustedHsb.b * (1 + bMult), minBriClamp, 1.0);
-        }
-      }
+      // Apply saturation and brightness adjustments
+      adjustedHsb.s = ColorMixer.utils.clamp(adjustedHsb.s * (1 + sMult), minSatClamp, 1.0);
+      adjustedHsb.b = ColorMixer.utils.clamp(adjustedHsb.b * (1 + bMult), minBriClamp, 1.0);
+
       console.log('Adjusted HSB (after):', adjustedHsb);
 
       // Convert back to RGB
@@ -262,8 +260,11 @@ const ColorMixer = {
     this.ui.updateSliderValues();
 
     // Set up event handlers for all inputs
-    $('#colorInput, #imgInput').on('input', () => {
+    $('#colorInput').on('input', () => {
       this.ui.updateColors();
+    });
+
+    $('#imgInput').on('input', () => {
       this.ui.updateBackgroundImage();
     });
 
