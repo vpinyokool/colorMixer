@@ -109,22 +109,151 @@ const ColorMixer = {
 
     // Add a new utility function to handle CORS proxy
     getCorsUrl(url) {
-      // Use cors-anywhere as a fallback if allorigins fails
-      const corsProxies = [
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-        `https://cors-anywhere.herokuapp.com/${url}`
-      ];
-      return corsProxies[0]; // Start with allorigins
+      return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
     },
 
-    // Add a function to check if URL is from Pinterest
+    // Add back Pinterest URL check
     isPinterestUrl(url) {
       return url.includes('pinimg.com') || url.includes('pinterest.com');
+    },
+
+    // Remove isPinterestUrl function since we'll handle all URLs the same way
+    async updateBackgroundImage() {
+      const imgUrl = $("#imgInput").val();
+      if (!imgUrl) {
+        $(".app-background").css({
+          "background": "none",
+          "background-color": "#111111"
+        });
+        $(".loading-bar").removeClass("active");
+        return;
+      }
+
+      try {
+        // Show loading bar
+        $(".loading-bar").addClass("active");
+
+        // Create a new image to test loading
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+
+        // For Pinterest images, use proxy URL directly
+        // For other images, try direct loading
+        const isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
+        const imageUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl;
+
+        // Load the image
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = imageUrl;
+        });
+
+        // Update background with the successful URL
+        $(".app-background").css({
+          "background": `url(${imageUrl})`,
+          "opacity": "1",
+          "background-size": "cover",
+          "background-position": "center"
+        });
+
+        // Extract dominant color using the already loaded image
+        const dominantColor = await getImageDominantColor(img);
+        const hexColor = extractorRgbToHex(dominantColor);
+        console.log('Extracted color:', hexColor);
+        $("#colorInput").val(hexColor).trigger('input');
+
+      } catch (error) {
+        console.error('Error processing image:', error);
+        $(".app-background").css({
+          "background": "none",
+          "background-color": "#111111"
+        });
+      } finally {
+        // Always hide loading bar when done
+        $(".loading-bar").removeClass("active");
+      }
+    },
+
+    updateBlurAmount() {
+      const blurAmount = $("#blurAmount").val();
+      $(".modal").css({
+        "backdrop-filter": `blur(${blurAmount}px)`,
+        "-webkit-backdrop-filter": `blur(${blurAmount}px)`
+      });
+    },
+
+    updateDarkMode() {
+      ColorMixer.state.darkMode = $("#darkModeToggle").is(":checked");
+      $(".modal").toggleClass("dark-mode", ColorMixer.state.darkMode);
+
+      // Update the mix label based on dark mode
+      const baseColor = ColorMixer.state.darkMode ? "black" : "white";
+      $(".slider-group label:contains('white'),.slider-group label:contains('black')").text(`${baseColor} / adjustedDom mix`);
+
+      this.updateColors();
     }
   },
 
   // UI update functions
   ui: {
+    async updateBackgroundImage() {
+      const imgUrl = $("#imgInput").val();
+      if (!imgUrl) {
+        $(".app-background").css({
+          "background": "none",
+          "background-color": "#111111"
+        });
+        $(".loading-bar").removeClass("active");
+        return;
+      }
+
+      try {
+        // Show loading bar
+        $(".loading-bar").addClass("active");
+
+        // Create a new image to test loading
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+
+        // For Pinterest images, use proxy URL directly
+        // For other images, try direct loading
+        const isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
+        const imageUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl;
+
+        // Load the image
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = imageUrl;
+        });
+
+        // Update background with the successful URL
+        $(".app-background").css({
+          "background": `url(${imageUrl})`,
+          "opacity": "1",
+          "background-size": "cover",
+          "background-position": "center"
+        });
+
+        // Extract dominant color using the already loaded image
+        const dominantColor = await getImageDominantColor(img);
+        const hexColor = extractorRgbToHex(dominantColor);
+        console.log('Extracted color:', hexColor);
+        $("#colorInput").val(hexColor).trigger('input');
+
+      } catch (error) {
+        console.error('Error processing image:', error);
+        $(".app-background").css({
+          "background": "none",
+          "background-color": "#111111"
+        });
+      } finally {
+        // Always hide loading bar when done
+        $(".loading-bar").removeClass("active");
+      }
+    },
+
     updateSliderValues() {
       $('.slider-group input[type="range"]').on('input', function() {
         const $value = $(this).siblings('.label-row').find('.value');
@@ -241,62 +370,6 @@ const ColorMixer = {
       $(".modal").css({
         "background": `rgba(${fin.r},${fin.g},${fin.b},${opac})`
       });
-    },
-
-    async updateBackgroundImage() {
-      const imgUrl = $("#imgInput").val();
-      if (!imgUrl) {
-        $(".app-background").css({
-          "background": "none",
-          "background-color": "#111111"
-        });
-        $(".loading-bar").removeClass("active");
-        return;
-      }
-
-      try {
-        // Show loading bar
-        $(".loading-bar").addClass("active");
-
-        // Create a new image to test loading
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-
-        // Always use CORS proxy for Pinterest images
-        const useProxy = ColorMixer.utils.isPinterestUrl(imgUrl);
-        const imageUrl = useProxy ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl;
-
-        // Load the image
-        await new Promise((resolve, reject) => {
-          img.onload = resolve;
-          img.onerror = reject;
-          img.src = imageUrl;
-        });
-
-        // Update background
-        $(".app-background").css({
-          "background": `url(${imageUrl})`,
-          "opacity": "1",
-          "background-size": "cover",
-          "background-position": "center"
-        });
-
-        // Extract dominant color
-        const dominantColor = await getImageDominantColor(imageUrl);
-        const hexColor = extractorRgbToHex(dominantColor);
-        console.log('Extracted color:', hexColor);
-        $("#colorInput").val(hexColor).trigger('input');
-
-      } catch (error) {
-        console.error('Error processing image:', error);
-        $(".app-background").css({
-          "background": "none",
-          "background-color": "#111111"
-        });
-      } finally {
-        // Always hide loading bar when done
-        $(".loading-bar").removeClass("active");
-      }
     },
 
     updateBlurAmount() {
