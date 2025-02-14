@@ -172,6 +172,9 @@ body {
 // Input section
 .input-section {
   transition: opacity $transition-duration $transition-timing;
+  h2 {
+    margin-top: $spacing;
+  }
 }
 
 h2 {
@@ -512,10 +515,10 @@ h2 {
 // Loading bar styles
 .loading-bar {
   position: absolute;
-  top: 12px;
+  top: 22px;
   left: 24px;
   right: 24px;
-  height: 2px;
+  height: 3px;
   opacity: 0;
   transition: opacity $transition-duration $transition-timing;
   background: rgba(0, 0, 0, 0.15);

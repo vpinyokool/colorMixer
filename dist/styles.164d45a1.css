@@ -122,6 +122,9 @@ body {
 .input-section {
   transition: opacity 0.3s ease;
 }
+.input-section h2 {
+  margin-top: 16px;
+}
 
 h2 {
   font-size: 14px;
@@ -413,10 +416,10 @@ h2 {
 
 .loading-bar {
   position: absolute;
-  top: 12px;
+  top: 22px;
   left: 24px;
   right: 24px;
-  height: 2px;
+  height: 3px;
   opacity: 0;
   transition: opacity 0.3s ease;
   background: rgba(0, 0, 0, 0.15);

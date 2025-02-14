@@ -101,12 +101,4 @@ function rgbToHex(rgb) {
     }).join('');
 }
 
-// Example usage:
-// getImageDominantColor('https://example.com/image.jpg')
-//     .then(dominantColor => {
-//         console.log('Dominant RGB:', dominantColor);
-//         console.log('Dominant Hex:', rgbToHex(dominantColor));
-//     })
-//     .catch(error => console.error(error));
-
 export { getImageDominantColor, rgbToHex };

@@ -117,7 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"colorExtractor.js":[function(require,module,exports) {
+})({"js/colorExtractor.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -283,18 +283,10 @@ function rgbToHex(rgb) {
     return hex.length === 1 ? '0' + hex : hex;
   }).join('');
 }
-
-// Example usage:
-// getImageDominantColor('https://example.com/image.jpg')
-//     .then(dominantColor => {
-//         console.log('Dominant RGB:', dominantColor);
-//         console.log('Dominant Hex:', rgbToHex(dominantColor));
-//     })
-//     .catch(error => console.error(error));
 },{}],"js/colorMixer.js":[function(require,module,exports) {
 "use strict";
 
-var _colorExtractor = require("../colorExtractor.js");
+var _colorExtractor = require("./colorExtractor.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
@@ -861,7 +853,7 @@ var ColorMixer = {
 $(document).ready(function () {
   return ColorMixer.init();
 });
-},{"../colorExtractor.js":"colorExtractor.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./colorExtractor.js":"js/colorExtractor.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;

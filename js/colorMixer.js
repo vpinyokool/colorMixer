@@ -1,5 +1,5 @@
 // Import color extraction functions
-import { getImageDominantColor, rgbToHex as extractorRgbToHex } from '../colorExtractor.js';
+import { getImageDominantColor, rgbToHex as extractorRgbToHex } from './colorExtractor.js';
 
 /**
  * Color Mixer Module
