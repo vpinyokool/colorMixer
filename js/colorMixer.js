@@ -133,31 +133,30 @@ const ColorMixer = {
         // Show loading bar
         $(".loading-bar").addClass("active");
 
-        // Create a new image to test loading
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-
-        // For Pinterest images, use proxy URL directly
-        // For other images, try direct loading
-        const isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
-        const imageUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl;
-
-        // Load the image
-        await new Promise((resolve, reject) => {
-          img.onload = resolve;
-          img.onerror = reject;
-          img.src = imageUrl;
-        });
-
-        // Update background with the successful URL
+        // Update background immediately with direct URL - no CORS needed for CSS background-image
         $(".app-background").css({
-          "background": `url(${imageUrl})`,
+          "background": `url(${imgUrl})`,
           "opacity": "1",
           "background-size": "cover",
           "background-position": "center"
         });
 
-        // Extract dominant color using the already loaded image
+        // Create a new image for color extraction - this needs CORS
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+
+        // For Pinterest images, use proxy URL for canvas operations
+        const isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
+        const canvasUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl;
+
+        // Load the image for canvas operations
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = canvasUrl;
+        });
+
+        // Extract dominant color using the loaded image
         const dominantColor = await getImageDominantColor(img);
         const hexColor = extractorRgbToHex(dominantColor);
         console.log('Extracted color:', hexColor);
@@ -212,31 +211,30 @@ const ColorMixer = {
         // Show loading bar
         $(".loading-bar").addClass("active");
 
-        // Create a new image to test loading
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-
-        // For Pinterest images, use proxy URL directly
-        // For other images, try direct loading
-        const isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
-        const imageUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl;
-
-        // Load the image
-        await new Promise((resolve, reject) => {
-          img.onload = resolve;
-          img.onerror = reject;
-          img.src = imageUrl;
-        });
-
-        // Update background with the successful URL
+        // Update background immediately with direct URL - no CORS needed for CSS background-image
         $(".app-background").css({
-          "background": `url(${imageUrl})`,
+          "background": `url(${imgUrl})`,
           "opacity": "1",
           "background-size": "cover",
           "background-position": "center"
         });
 
-        // Extract dominant color using the already loaded image
+        // Create a new image for color extraction - this needs CORS
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+
+        // For Pinterest images, use proxy URL for canvas operations
+        const isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
+        const canvasUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl;
+
+        // Load the image for canvas operations
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = canvasUrl;
+        });
+
+        // Extract dominant color using the loaded image
         const dominantColor = await getImageDominantColor(img);
         const hexColor = extractorRgbToHex(dominantColor);
         console.log('Extracted color:', hexColor);

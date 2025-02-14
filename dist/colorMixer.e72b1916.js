@@ -421,7 +421,7 @@ var ColorMixer = {
     // Remove isPinterestUrl function since we'll handle all URLs the same way
     updateBackgroundImage: function updateBackgroundImage() {
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var imgUrl, img, isPinterest, imageUrl, dominantColor, hexColor;
+        var imgUrl, img, isPinterest, canvasUrl, dominantColor, hexColor;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
@@ -441,30 +441,28 @@ var ColorMixer = {
               // Show loading bar
               $(".loading-bar").addClass("active");
 
-              // Create a new image to test loading
-              img = new Image();
-              img.crossOrigin = "anonymous";
-
-              // For Pinterest images, use proxy URL directly
-              // For other images, try direct loading
-              isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
-              imageUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl; // Load the image
-              _context.next = 13;
-              return new Promise(function (resolve, reject) {
-                img.onload = resolve;
-                img.onerror = reject;
-                img.src = imageUrl;
-              });
-            case 13:
-              // Update background with the successful URL
+              // Update background immediately with direct URL - no CORS needed for CSS background-image
               $(".app-background").css({
-                "background": "url(".concat(imageUrl, ")"),
+                "background": "url(".concat(imgUrl, ")"),
                 "opacity": "1",
                 "background-size": "cover",
                 "background-position": "center"
               });
 
-              // Extract dominant color using the already loaded image
+              // Create a new image for color extraction - this needs CORS
+              img = new Image();
+              img.crossOrigin = "anonymous";
+
+              // For Pinterest images, use proxy URL for canvas operations
+              isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
+              canvasUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl; // Load the image for canvas operations
+              _context.next = 14;
+              return new Promise(function (resolve, reject) {
+                img.onload = resolve;
+                img.onerror = reject;
+                img.src = canvasUrl;
+              });
+            case 14:
               _context.next = 16;
               return (0, _colorExtractor.getImageDominantColor)(img);
             case 16:
@@ -515,7 +513,7 @@ var ColorMixer = {
   ui: {
     updateBackgroundImage: function updateBackgroundImage() {
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var imgUrl, img, isPinterest, imageUrl, dominantColor, hexColor;
+        var imgUrl, img, isPinterest, canvasUrl, dominantColor, hexColor;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
@@ -535,30 +533,28 @@ var ColorMixer = {
               // Show loading bar
               $(".loading-bar").addClass("active");
 
-              // Create a new image to test loading
-              img = new Image();
-              img.crossOrigin = "anonymous";
-
-              // For Pinterest images, use proxy URL directly
-              // For other images, try direct loading
-              isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
-              imageUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl; // Load the image
-              _context2.next = 13;
-              return new Promise(function (resolve, reject) {
-                img.onload = resolve;
-                img.onerror = reject;
-                img.src = imageUrl;
-              });
-            case 13:
-              // Update background with the successful URL
+              // Update background immediately with direct URL - no CORS needed for CSS background-image
               $(".app-background").css({
-                "background": "url(".concat(imageUrl, ")"),
+                "background": "url(".concat(imgUrl, ")"),
                 "opacity": "1",
                 "background-size": "cover",
                 "background-position": "center"
               });
 
-              // Extract dominant color using the already loaded image
+              // Create a new image for color extraction - this needs CORS
+              img = new Image();
+              img.crossOrigin = "anonymous";
+
+              // For Pinterest images, use proxy URL for canvas operations
+              isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
+              canvasUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl; // Load the image for canvas operations
+              _context2.next = 14;
+              return new Promise(function (resolve, reject) {
+                img.onload = resolve;
+                img.onerror = reject;
+                img.src = canvasUrl;
+              });
+            case 14:
               _context2.next = 16;
               return (0, _colorExtractor.getImageDominantColor)(img);
             case 16:
