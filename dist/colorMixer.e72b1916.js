@@ -591,8 +591,8 @@ var ColorMixer = {
       $(".modal").toggleClass("dark-mode", ColorMixer.state.darkMode);
 
       // Update the mix label based on dark mode
-      var baseColor = ColorMixer.state.darkMode ? "black" : "white";
-      $(".slider-group label:contains('white'),.slider-group label:contains('black')").text("".concat(baseColor, " / adjustedDom mix"));
+      var baseColor = ColorMixer.state.darkMode ? "Black" : "White";
+      $(".slider-group label:contains('white'), .slider-group label:contains('black'), .slider-group label:contains('White'), .slider-group label:contains('Black')").text("".concat(baseColor, " / adjustedDom mix"));
       this.updateColors();
     }
   },
@@ -802,8 +802,8 @@ var ColorMixer = {
       $(".modal").toggleClass("dark-mode", ColorMixer.state.darkMode);
 
       // Update the mix label based on dark mode
-      var baseColor = ColorMixer.state.darkMode ? "black" : "white";
-      $(".slider-group label:contains('white'),.slider-group label:contains('black')").text("".concat(baseColor, " / adjustedDom mix"));
+      var baseColor = ColorMixer.state.darkMode ? "Black" : "White";
+      $(".slider-group label:contains('white'), .slider-group label:contains('black'), .slider-group label:contains('White'), .slider-group label:contains('Black')").text("".concat(baseColor, " / adjustedDom mix"));
       this.updateColors();
     }
   },

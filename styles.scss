@@ -8,6 +8,9 @@ $font-large: 14px;
 $modal-width: 550px;
 $background-color: #111111;
 $switch-green: #34C759;
+$loading-opacity: 0.25;
+$transition-duration: 0.3s;
+$transition-timing: ease;
 
 // Dark mode variables
 $dark-text-color: #FFFFFF;
@@ -144,11 +147,17 @@ body {
 // Container
 .container {
   padding: 24px;
-  transition: opacity 0.3s ease;
+  position: relative;
+
+  .content-wrapper {
+    transition: opacity $transition-duration $transition-timing;
+  }
 
   &.loading {
-    opacity: 0.5;
-    pointer-events: none;
+    .content-wrapper {
+      opacity: $loading-opacity;
+      pointer-events: none;
+    }
   }
 
   section {
@@ -162,7 +171,7 @@ body {
 
 // Input section
 .input-section {
-  transition: opacity 0.3s ease;
+  transition: opacity $transition-duration $transition-timing;
 }
 
 h2 {
@@ -219,16 +228,10 @@ h2 {
   }
 }
 
-// Add loading state styles
+// Remove old loading state styles since we're handling it at container level
 .input-wrapper,
 .result-section {
   position: relative;
-  transition: opacity 0.3s ease;
-
-  &.loading {
-    opacity: 0.5;
-    pointer-events: none;
-  }
 }
 
 // Sliders
@@ -508,17 +511,17 @@ h2 {
 
 // Loading bar styles
 .loading-bar {
-  height: 2px;
-  width: 100%;
-  margin-top: 8px;
+  position: absolute;
+  top: 12px;
+  left: 24px;
+  right: 24px;
+  height: 3px;
   opacity: 0;
-  transition: opacity 0.2s ease;
-  background: rgba(0, 0, 0, 0.35);
+  transition: opacity $transition-duration $transition-timing;
+  background: rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  position: relative;
-  margin-left: 2px;
-  margin-right: 2px;
   z-index: 10;
+  border-radius: 4px;
 
   &.active {
     opacity: 1;
@@ -534,9 +537,9 @@ h2 {
     background: linear-gradient(
       90deg,
       rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0.8) 20%,
+      rgba(0, 0, 0, 0.8) 35%,
       rgba(0, 0, 0, 1) 50%,
-      rgba(0, 0, 0, 0.8) 80%,
+      rgba(0, 0, 0, 0.8) 65%,
       rgba(0, 0, 0, 0) 100%
     );
     animation: ping-pong 3s ease-in-out infinite;
@@ -565,9 +568,9 @@ h2 {
       background: linear-gradient(
         90deg,
         rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.8) 20%,
+        rgba(255, 255, 255, 0.8) 35%,
         rgba(255, 255, 255, 1) 50%,
-        rgba(255, 255, 255, 0.8) 80%,
+        rgba(255, 255, 255, 0.8) 65%,
         rgba(255, 255, 255, 0) 100%
       );
     }
