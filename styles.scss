@@ -144,6 +144,12 @@ body {
 // Container
 .container {
   padding: 24px;
+  transition: opacity 0.3s ease;
+
+  &.loading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 
   section {
     padding-top: 32px;
@@ -155,6 +161,9 @@ body {
 }
 
 // Input section
+.input-section {
+  transition: opacity 0.3s ease;
+}
 
 h2 {
   font-size: $font-large;
@@ -175,6 +184,7 @@ h2 {
 
 .input-group {
   margin-bottom: $spacing;
+  transition: opacity 0.3s ease;
 
   label {
     display: block;
@@ -201,13 +211,30 @@ h2 {
       outline: none;
       background: rgba(0, 0, 0, 0.15);
     }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Add loading state styles
+.input-wrapper,
+.result-section {
+  position: relative;
+  transition: opacity 0.3s ease;
+
+  &.loading {
+    opacity: 0.5;
+    pointer-events: none;
   }
 }
 
 // Sliders
 .sliders {
   margin: 0;
-  margin-top: $spacing * 2;
+  margin-top: $spacing;
 
   h2 {
     margin-bottom: 4px;
@@ -486,11 +513,12 @@ h2 {
   margin-top: 8px;
   opacity: 0;
   transition: opacity 0.2s ease;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.35);
   overflow: hidden;
   position: relative;
   margin-left: 2px;
   margin-right: 2px;
+  z-index: 10;
 
   &.active {
     opacity: 1;
@@ -506,9 +534,9 @@ h2 {
     background: linear-gradient(
       90deg,
       rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0.2) 20%,
-      rgba(0, 0, 0, 0.3) 50%,
-      rgba(0, 0, 0, 0.2) 80%,
+      rgba(0, 0, 0, 0.8) 20%,
+      rgba(0, 0, 0, 1) 50%,
+      rgba(0, 0, 0, 0.8) 80%,
       rgba(0, 0, 0, 0) 100%
     );
     animation: ping-pong 3s ease-in-out infinite;
@@ -531,15 +559,15 @@ h2 {
 // Dark mode adjustments for loading bar
 .dark-mode {
   .loading-bar {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.35);
 
     &::after {
       background: linear-gradient(
         90deg,
         rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.2) 20%,
-        rgba(255, 255, 255, 0.4) 50%,
-        rgba(255, 255, 255, 0.2) 80%,
+        rgba(255, 255, 255, 0.8) 20%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(255, 255, 255, 0.8) 80%,
         rgba(255, 255, 255, 0) 100%
       );
     }

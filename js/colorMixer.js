@@ -107,9 +107,16 @@ const ColorMixer = {
       });
     },
 
-    // Add a new utility function to handle CORS proxy
+    // Add a new utility function to handle CORS proxy with retries and fallback
     getCorsUrl(url) {
-      return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+      // List of proxy services
+      const proxyServices = [
+        (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        (url) => `https://cors-anywhere.herokuapp.com/${url}`
+      ];
+
+      return proxyServices[0](url); // Start with first proxy
     },
 
     // Add back Pinterest URL check
@@ -117,7 +124,46 @@ const ColorMixer = {
       return url.includes('pinimg.com') || url.includes('pinterest.com');
     },
 
-    // Remove isPinterestUrl function since we'll handle all URLs the same way
+    async loadImageWithRetry(url, maxRetries = 2) {
+      let lastError;
+
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+
+          await new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => reject(new Error('Image load timeout')), 10000);
+
+            img.onload = () => {
+              clearTimeout(timeoutId);
+              resolve();
+            };
+
+            img.onerror = (error) => {
+              clearTimeout(timeoutId);
+              reject(error);
+            };
+
+            img.src = url;
+          });
+
+          return img;
+        } catch (error) {
+          console.log(`Attempt ${attempt + 1} failed:`, error);
+          lastError = error;
+
+          // If this wasn't the last attempt, wait before retrying
+          if (attempt < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+          }
+        }
+      }
+
+      throw lastError;
+    },
+
+    // Update background image function
     async updateBackgroundImage() {
       const imgUrl = $("#imgInput").val();
       if (!imgUrl) {
@@ -126,12 +172,16 @@ const ColorMixer = {
           "background-color": "#111111"
         });
         $(".loading-bar").removeClass("active");
+        $(".container").removeClass("loading");
+        $("#imgInput").prop("disabled", false);
         return;
       }
 
       try {
-        // Show loading bar
+        // Show loading state
         $(".loading-bar").addClass("active");
+        $(".container").addClass("loading");
+        $("#imgInput").prop("disabled", true);
 
         // Update background immediately with direct URL - no CORS needed for CSS background-image
         $(".app-background").css({
@@ -141,20 +191,12 @@ const ColorMixer = {
           "background-position": "center"
         });
 
-        // Create a new image for color extraction - this needs CORS
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-
         // For Pinterest images, use proxy URL for canvas operations
         const isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
         const canvasUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl;
 
-        // Load the image for canvas operations
-        await new Promise((resolve, reject) => {
-          img.onload = resolve;
-          img.onerror = reject;
-          img.src = canvasUrl;
-        });
+        // Load the image with retry mechanism
+        const img = await ColorMixer.utils.loadImageWithRetry(canvasUrl);
 
         // Extract dominant color using the loaded image
         const dominantColor = await getImageDominantColor(img);
@@ -164,13 +206,12 @@ const ColorMixer = {
 
       } catch (error) {
         console.error('Error processing image:', error);
-        $(".app-background").css({
-          "background": "none",
-          "background-color": "#111111"
-        });
+        // Don't reset the background on error, just show error in console
       } finally {
-        // Always hide loading bar when done
+        // Always hide loading state when done
         $(".loading-bar").removeClass("active");
+        $(".container").removeClass("loading");
+        $("#imgInput").prop("disabled", false);
       }
     },
 
@@ -204,12 +245,16 @@ const ColorMixer = {
           "background-color": "#111111"
         });
         $(".loading-bar").removeClass("active");
+        $(".container").removeClass("loading");
+        $("#imgInput").prop("disabled", false);
         return;
       }
 
       try {
-        // Show loading bar
+        // Show loading state
         $(".loading-bar").addClass("active");
+        $(".container").addClass("loading");
+        $("#imgInput").prop("disabled", true);
 
         // Update background immediately with direct URL - no CORS needed for CSS background-image
         $(".app-background").css({
@@ -247,8 +292,10 @@ const ColorMixer = {
           "background-color": "#111111"
         });
       } finally {
-        // Always hide loading bar when done
+        // Always hide loading state when done
         $(".loading-bar").removeClass("active");
+        $(".container").removeClass("loading");
+        $("#imgInput").prop("disabled", false);
       }
     },
 

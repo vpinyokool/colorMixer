@@ -410,24 +410,115 @@ var ColorMixer = {
         b: Math.round(hsb.b * 100)
       });
     },
-    // Add a new utility function to handle CORS proxy
+    // Add a new utility function to handle CORS proxy with retries and fallback
     getCorsUrl: function getCorsUrl(url) {
-      return "https://api.allorigins.win/raw?url=".concat(encodeURIComponent(url));
+      // List of proxy services
+      var proxyServices = [function (url) {
+        return "https://api.allorigins.win/raw?url=".concat(encodeURIComponent(url));
+      }, function (url) {
+        return "https://corsproxy.io/?".concat(encodeURIComponent(url));
+      }, function (url) {
+        return "https://cors-anywhere.herokuapp.com/".concat(url);
+      }];
+      return proxyServices[0](url); // Start with first proxy
     },
     // Add back Pinterest URL check
     isPinterestUrl: function isPinterestUrl(url) {
       return url.includes('pinimg.com') || url.includes('pinterest.com');
     },
-    // Remove isPinterestUrl function since we'll handle all URLs the same way
-    updateBackgroundImage: function updateBackgroundImage() {
+    loadImageWithRetry: function loadImageWithRetry(url) {
+      var _arguments = arguments;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var imgUrl, img, isPinterest, canvasUrl, dominantColor, hexColor;
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
+        var maxRetries, lastError, _loop, _ret, attempt;
+        return _regeneratorRuntime().wrap(function _callee$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              maxRetries = _arguments.length > 1 && _arguments[1] !== undefined ? _arguments[1] : 2;
+              _loop = /*#__PURE__*/_regeneratorRuntime().mark(function _loop(attempt) {
+                var img;
+                return _regeneratorRuntime().wrap(function _loop$(_context) {
+                  while (1) switch (_context.prev = _context.next) {
+                    case 0:
+                      _context.prev = 0;
+                      img = new Image();
+                      img.crossOrigin = "anonymous";
+                      _context.next = 5;
+                      return new Promise(function (resolve, reject) {
+                        var timeoutId = setTimeout(function () {
+                          return reject(new Error('Image load timeout'));
+                        }, 10000);
+                        img.onload = function () {
+                          clearTimeout(timeoutId);
+                          resolve();
+                        };
+                        img.onerror = function (error) {
+                          clearTimeout(timeoutId);
+                          reject(error);
+                        };
+                        img.src = url;
+                      });
+                    case 5:
+                      return _context.abrupt("return", {
+                        v: img
+                      });
+                    case 8:
+                      _context.prev = 8;
+                      _context.t0 = _context["catch"](0);
+                      console.log("Attempt ".concat(attempt + 1, " failed:"), _context.t0);
+                      lastError = _context.t0;
+
+                      // If this wasn't the last attempt, wait before retrying
+                      if (!(attempt < maxRetries)) {
+                        _context.next = 15;
+                        break;
+                      }
+                      _context.next = 15;
+                      return new Promise(function (resolve) {
+                        return setTimeout(resolve, 1000 * (attempt + 1));
+                      });
+                    case 15:
+                    case "end":
+                      return _context.stop();
+                  }
+                }, _loop, null, [[0, 8]]);
+              });
+              attempt = 0;
+            case 3:
+              if (!(attempt <= maxRetries)) {
+                _context2.next = 11;
+                break;
+              }
+              return _context2.delegateYield(_loop(attempt), "t0", 5);
+            case 5:
+              _ret = _context2.t0;
+              if (!_ret) {
+                _context2.next = 8;
+                break;
+              }
+              return _context2.abrupt("return", _ret.v);
+            case 8:
+              attempt++;
+              _context2.next = 3;
+              break;
+            case 11:
+              throw lastError;
+            case 12:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee);
+      }))();
+    },
+    // Update background image function
+    updateBackgroundImage: function updateBackgroundImage() {
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var imgUrl, isPinterest, canvasUrl, img, dominantColor, hexColor;
+        return _regeneratorRuntime().wrap(function _callee2$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
             case 0:
               imgUrl = $("#imgInput").val();
               if (imgUrl) {
-                _context.next = 5;
+                _context3.next = 7;
                 break;
               }
               $(".app-background").css({
@@ -435,11 +526,15 @@ var ColorMixer = {
                 "background-color": "#111111"
               });
               $(".loading-bar").removeClass("active");
-              return _context.abrupt("return");
-            case 5:
-              _context.prev = 5;
-              // Show loading bar
+              $(".container").removeClass("loading");
+              $("#imgInput").prop("disabled", false);
+              return _context3.abrupt("return");
+            case 7:
+              _context3.prev = 7;
+              // Show loading state
               $(".loading-bar").addClass("active");
+              $(".container").addClass("loading");
+              $("#imgInput").prop("disabled", true);
 
               // Update background immediately with direct URL - no CORS needed for CSS background-image
               $(".app-background").css({
@@ -449,47 +544,39 @@ var ColorMixer = {
                 "background-position": "center"
               });
 
-              // Create a new image for color extraction - this needs CORS
-              img = new Image();
-              img.crossOrigin = "anonymous";
-
               // For Pinterest images, use proxy URL for canvas operations
               isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
-              canvasUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl; // Load the image for canvas operations
-              _context.next = 14;
-              return new Promise(function (resolve, reject) {
-                img.onload = resolve;
-                img.onerror = reject;
-                img.src = canvasUrl;
-              });
-            case 14:
-              _context.next = 16;
-              return (0, _colorExtractor.getImageDominantColor)(img);
+              canvasUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl; // Load the image with retry mechanism
+              _context3.next = 16;
+              return ColorMixer.utils.loadImageWithRetry(canvasUrl);
             case 16:
-              dominantColor = _context.sent;
+              img = _context3.sent;
+              _context3.next = 19;
+              return (0, _colorExtractor.getImageDominantColor)(img);
+            case 19:
+              dominantColor = _context3.sent;
               hexColor = (0, _colorExtractor.rgbToHex)(dominantColor);
               console.log('Extracted color:', hexColor);
               $("#colorInput").val(hexColor).trigger('input');
-              _context.next = 26;
+              _context3.next = 28;
               break;
-            case 22:
-              _context.prev = 22;
-              _context.t0 = _context["catch"](5);
-              console.error('Error processing image:', _context.t0);
-              $(".app-background").css({
-                "background": "none",
-                "background-color": "#111111"
-              });
-            case 26:
-              _context.prev = 26;
-              // Always hide loading bar when done
+            case 25:
+              _context3.prev = 25;
+              _context3.t0 = _context3["catch"](7);
+              console.error('Error processing image:', _context3.t0);
+              // Don't reset the background on error, just show error in console
+            case 28:
+              _context3.prev = 28;
+              // Always hide loading state when done
               $(".loading-bar").removeClass("active");
-              return _context.finish(26);
-            case 29:
+              $(".container").removeClass("loading");
+              $("#imgInput").prop("disabled", false);
+              return _context3.finish(28);
+            case 33:
             case "end":
-              return _context.stop();
+              return _context3.stop();
           }
-        }, _callee, null, [[5, 22, 26, 29]]);
+        }, _callee2, null, [[7, 25, 28, 33]]);
       }))();
     },
     updateBlurAmount: function updateBlurAmount() {
@@ -512,14 +599,14 @@ var ColorMixer = {
   // UI update functions
   ui: {
     updateBackgroundImage: function updateBackgroundImage() {
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var imgUrl, img, isPinterest, canvasUrl, dominantColor, hexColor;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
+        return _regeneratorRuntime().wrap(function _callee3$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
             case 0:
               imgUrl = $("#imgInput").val();
               if (imgUrl) {
-                _context2.next = 5;
+                _context4.next = 7;
                 break;
               }
               $(".app-background").css({
@@ -527,11 +614,15 @@ var ColorMixer = {
                 "background-color": "#111111"
               });
               $(".loading-bar").removeClass("active");
-              return _context2.abrupt("return");
-            case 5:
-              _context2.prev = 5;
-              // Show loading bar
+              $(".container").removeClass("loading");
+              $("#imgInput").prop("disabled", false);
+              return _context4.abrupt("return");
+            case 7:
+              _context4.prev = 7;
+              // Show loading state
               $(".loading-bar").addClass("active");
+              $(".container").addClass("loading");
+              $("#imgInput").prop("disabled", true);
 
               // Update background immediately with direct URL - no CORS needed for CSS background-image
               $(".app-background").css({
@@ -548,40 +639,42 @@ var ColorMixer = {
               // For Pinterest images, use proxy URL for canvas operations
               isPinterest = ColorMixer.utils.isPinterestUrl(imgUrl);
               canvasUrl = isPinterest ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl; // Load the image for canvas operations
-              _context2.next = 14;
+              _context4.next = 18;
               return new Promise(function (resolve, reject) {
                 img.onload = resolve;
                 img.onerror = reject;
                 img.src = canvasUrl;
               });
-            case 14:
-              _context2.next = 16;
+            case 18:
+              _context4.next = 20;
               return (0, _colorExtractor.getImageDominantColor)(img);
-            case 16:
-              dominantColor = _context2.sent;
+            case 20:
+              dominantColor = _context4.sent;
               hexColor = (0, _colorExtractor.rgbToHex)(dominantColor);
               console.log('Extracted color:', hexColor);
               $("#colorInput").val(hexColor).trigger('input');
-              _context2.next = 26;
+              _context4.next = 30;
               break;
-            case 22:
-              _context2.prev = 22;
-              _context2.t0 = _context2["catch"](5);
-              console.error('Error processing image:', _context2.t0);
+            case 26:
+              _context4.prev = 26;
+              _context4.t0 = _context4["catch"](7);
+              console.error('Error processing image:', _context4.t0);
               $(".app-background").css({
                 "background": "none",
                 "background-color": "#111111"
               });
-            case 26:
-              _context2.prev = 26;
-              // Always hide loading bar when done
+            case 30:
+              _context4.prev = 30;
+              // Always hide loading state when done
               $(".loading-bar").removeClass("active");
-              return _context2.finish(26);
-            case 29:
+              $(".container").removeClass("loading");
+              $("#imgInput").prop("disabled", false);
+              return _context4.finish(30);
+            case 35:
             case "end":
-              return _context2.stop();
+              return _context4.stop();
           }
-        }, _callee2, null, [[5, 22, 26, 29]]);
+        }, _callee3, null, [[7, 26, 30, 35]]);
       }))();
     },
     updateSliderValues: function updateSliderValues() {
