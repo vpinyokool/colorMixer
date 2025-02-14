@@ -1,13 +1,12 @@
 {
   "name": "color-mixer",
   "version": "1.0.0",
-  "description": "A color mixer tool with HSB adjustments",
-  "main": "index.html",
+  "description": "Color mixer tool for UI design",
+  "source": "index.html",
+  "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
-    "start": "parcel index.html --open",
-    "build": "parcel build index.html --public-url ./",
-    "clean": "rm -rf .cache dist",
-    "dev": "npm run clean && npm start"
+    "start": "parcel",
+    "build": "parcel build"
   },
   "keywords": [
     "html",
@@ -19,8 +18,7 @@
     "jquery": "^3.6.0"
   },
   "devDependencies": {
-    "gh-pages": "^3.2.3",
-    "parcel-bundler": "^1.12.5",
-    "sass": "^1.69.5"
+    "@parcel/transformer-sass": "^2.9.3",
+    "parcel": "^2.9.3"
   }
 }
