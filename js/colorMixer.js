@@ -1,3 +1,6 @@
+// Import color extraction functions
+import { getImageDominantColor, rgbToHex as extractorRgbToHex } from '../colorExtractor.js';
+
 /**
  * Color Mixer Module
  * Handles color conversions and UI updates for the color mixer application
@@ -102,6 +105,21 @@ const ColorMixer = {
         s: Math.round(hsb.s * 100),
         b: Math.round(hsb.b * 100)
       });
+    },
+
+    // Add a new utility function to handle CORS proxy
+    getCorsUrl(url) {
+      // Use cors-anywhere as a fallback if allorigins fails
+      const corsProxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        `https://cors-anywhere.herokuapp.com/${url}`
+      ];
+      return corsProxies[0]; // Start with allorigins
+    },
+
+    // Add a function to check if URL is from Pinterest
+    isPinterestUrl(url) {
+      return url.includes('pinimg.com') || url.includes('pinterest.com');
     }
   },
 
@@ -225,20 +243,59 @@ const ColorMixer = {
       });
     },
 
-    updateBackgroundImage() {
+    async updateBackgroundImage() {
       const imgUrl = $("#imgInput").val();
-      if (imgUrl) {
+      if (!imgUrl) {
         $(".app-background").css({
-          "background-image": `url(${imgUrl})`,
+          "background": "none",
+          "background-color": "#111111"
+        });
+        $(".loading-bar").removeClass("active");
+        return;
+      }
+
+      try {
+        // Show loading bar
+        $(".loading-bar").addClass("active");
+
+        // Create a new image to test loading
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+
+        // Always use CORS proxy for Pinterest images
+        const useProxy = ColorMixer.utils.isPinterestUrl(imgUrl);
+        const imageUrl = useProxy ? ColorMixer.utils.getCorsUrl(imgUrl) : imgUrl;
+
+        // Load the image
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = imageUrl;
+        });
+
+        // Update background
+        $(".app-background").css({
+          "background": `url(${imageUrl})`,
+          "opacity": "1",
           "background-size": "cover",
-          "background-position": "center",
-          "background-color": "#111111"
+          "background-position": "center"
         });
-      } else {
+
+        // Extract dominant color
+        const dominantColor = await getImageDominantColor(imageUrl);
+        const hexColor = extractorRgbToHex(dominantColor);
+        console.log('Extracted color:', hexColor);
+        $("#colorInput").val(hexColor).trigger('input');
+
+      } catch (error) {
+        console.error('Error processing image:', error);
         $(".app-background").css({
-          "background-image": "none",
+          "background": "none",
           "background-color": "#111111"
         });
+      } finally {
+        // Always hide loading bar when done
+        $(".loading-bar").removeClass("active");
       }
     },
 
