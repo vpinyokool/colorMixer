@@ -416,7 +416,7 @@ h2 {
   top: 12px;
   left: 24px;
   right: 24px;
-  height: 3px;
+  height: 2px;
   opacity: 0;
   transition: opacity 0.3s ease;
   background: rgba(0, 0, 0, 0.15);
@@ -444,7 +444,7 @@ h2 {
     transform: translateX(0%);
   }
   50% {
-    transform: translateX(300%);
+    transform: translateX(400%);
   }
   100% {
     transform: translateX(0%);
